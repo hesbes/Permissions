@@ -72,6 +72,10 @@ public class Permissions extends JavaPlugin {
 
     private boolean errorFlag = false;
 
+    
+    public String getDefaultWorld() {
+        return defaultWorld;
+    }
     // protected String pluginInternalName = "Permissions";
 
     public Permissions() {

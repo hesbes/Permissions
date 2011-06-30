@@ -323,6 +323,17 @@ public abstract class Entry {
         if (store != null)
             store.removeParent(name, group.world, group.name);
     }
+    
+    public void setParents(LinkedHashSet<Group> groups) {
+        groupClearCache();
+        LinkedHashSet<GroupWorld> groupWs = new LinkedHashSet<GroupWorld>();
+        for(Group g : groups)
+            if(g != null)
+                groupWs.add(g.toGroupWorld());
+        Storage store = getStorage();
+        if (store != null)
+            store.setParents(name, groupWs);
+    }
 
     /**
      * Checks this entry and its ancestors for the specified permission

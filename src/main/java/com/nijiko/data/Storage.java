@@ -14,6 +14,7 @@ public interface Storage {
     public LinkedHashSet<GroupWorld> getParents(String name);
     public void addParent(String name, String groupWorld, String groupName);
     public void removeParent(String name, String groupWorld, String groupName);
+    public void setParents(String name, LinkedHashSet<GroupWorld> groupWs);
     
     public Set<String> getEntries();
     public EntryType getType();
