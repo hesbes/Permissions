@@ -266,7 +266,6 @@ public class ModularControl extends PermissionHandler {
         if (name == null || name.isEmpty() || world == null || world.isEmpty())
             return true;
         // System.out.println("Checking world '" + world + "', user '" + name + "'.");
-        world = getParentWorldUser(world);
         User user = this.getUsr(world, name);
         if (user == null)
             return false;

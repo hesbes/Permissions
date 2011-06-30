@@ -24,8 +24,7 @@ import com.nijiko.data.Storage;
 
 //TODO: Cleanup and docs
 /**
- * This abstract class represents a user or a group.
- * It provides general functions are shared by both groups and users.
+ * This abstract class represents a user or a group. It provides general functions are shared by both groups and users.
  */
 public abstract class Entry {
 
@@ -48,16 +47,15 @@ public abstract class Entry {
      * Clears the cache of this entry.
      */
     public void clearCache() {
-        for(Iterator<CheckResult> iter = cache.values().iterator();iter.hasNext();) {
+        for (Iterator<CheckResult> iter = cache.values().iterator(); iter.hasNext();) {
             iter.next().invalidate();
             iter.remove();
         }
     }
-    
+
     /**
-     * Method called if a parent is added/removed.
-     * Impl note: Currently Clears ALL caches. 
-     * TODO: Is checking all entry if they are affected more effecient than clearing all caches? 
+     * Method called if a parent is added/removed. Impl note: Currently Clears ALL caches. TODO: Is checking all entries if they are affected more efficient than clearing all caches?
+     * Or should there be a getChildren() function?
      */
     private void groupClearCache() {
         controller.clearAllCaches();
@@ -65,6 +63,7 @@ public abstract class Entry {
 
     /**
      * Attempts to delete this entry.
+     * 
      * @return Whether the deletion was successful.
      */
     public boolean delete() {
@@ -80,7 +79,9 @@ public abstract class Entry {
 
     /**
      * Adds a transient permission, which will last to the next minor reload.
-     * @param node Transient permission node to add
+     * 
+     * @param node
+     *            Transient permission node to add
      */
     public void addTransientPermission(String node) {
         if (node == null)
@@ -91,7 +92,9 @@ public abstract class Entry {
 
     /**
      * Removes a transient permission.
-     * @param node Transient permission node to remove
+     * 
+     * @param node
+     *            Transient permission node to remove
      */
     public void removeTransientPermission(String node) {
         if (node == null)
@@ -112,8 +115,11 @@ public abstract class Entry {
 
     /**
      * Adds a timed permission. The duration is measured in server ticks.
-     * @param node Timed permission node to add
-     * @param duration Duration in server ticks
+     * 
+     * @param node
+     *            Timed permission node to add
+     * @param duration
+     *            Duration in server ticks
      * @return Previous duration for the timed permission node if it was added before, if any, or null otherwise.
      */
     public Long addTimedPermission(String node, long duration) {
@@ -122,9 +128,12 @@ public abstract class Entry {
         clearCacheNode(node);
         return timedPerms.put(node, duration);
     }
+
     /**
      * Removes a timed permission.
-     * @param node Timed permission node to add
+     * 
+     * @param node
+     *            Timed permission node to add
      * @return Previous duration for the timed permission node, if any, or null otherwise.
      */
     public Long removeTimedPermission(String node) {
@@ -136,7 +145,9 @@ public abstract class Entry {
 
     /**
      * Get the remaining duration for a timed permission node
-     * @param node Timed permission node to check
+     * 
+     * @param node
+     *            Timed permission node to check
      * @return Previous duration for the timed permission node, if any, or null otherwise.
      */
     public Long getDuration(String node) {
@@ -155,7 +166,9 @@ public abstract class Entry {
 
     /**
      * Interval function used by ticker task. This periodically updates the duration.
-     * @param interval Interval in server ticks
+     * 
+     * @param interval
+     *            Interval in server ticks
      */
     void tick(long interval) {
         if (interval <= 0)
@@ -182,7 +195,9 @@ public abstract class Entry {
 
     /**
      * Used by PermissionWorld to copy timed perms to the new entry object
-     * @param e Old entry from previous load. Must have the same world and name as this instance.
+     * 
+     * @param e
+     *            Old entry from previous load. Must have the same world and name as this instance.
      */
     void copyTimedMap(Entry e) {
         if (!this.equals(e))
@@ -192,6 +207,7 @@ public abstract class Entry {
 
     /**
      * Returns a set containing all current timed permissions. This set will not reflect changes made after creation.
+     * 
      * @return Set containing all current timed permissions.
      */
     protected Set<String> getTimedPermissions() {
@@ -200,6 +216,7 @@ public abstract class Entry {
 
     /**
      * Returns an unmodifiable view of the cache.
+     * 
      * @return
      */
     public Map<String, CheckResult> getCache() {
@@ -207,15 +224,15 @@ public abstract class Entry {
     }
 
     /**
-     * Abstract method implemented by subclasses to return the storage instance.
-     * This method needs to be implemented so as to allow many methods in this class to work.
+     * Abstract method implemented by subclasses to return the storage instance. This method needs to be implemented so as to allow many methods in this class to work.
+     * 
      * @return Storage instance used by subclasses
      */
     protected abstract Storage getStorage();
 
     /**
-     * Returns a set containing the permissions of this entry, including timed and transient permissions.
-     * This set will not reflect any modifications made after its creation.
+     * Returns a set containing the permissions of this entry, including timed and transient permissions. This set will not reflect any modifications made after its creation.
+     * 
      * @return Set containing this entry's permissions.
      */
     public Set<String> getPermissions() {
@@ -230,6 +247,7 @@ public abstract class Entry {
 
     /**
      * Returns a set containing world name-group name pairs that represent this entry's parents
+     * 
      * @return Set containing this entry's parents in world name-group name pair form.
      */
     public LinkedHashSet<GroupWorld> getRawParents() {
@@ -241,8 +259,11 @@ public abstract class Entry {
 
     /**
      * Add/removes a node. Its behaviour depends on the <tt>add</tt> parameter.
-     * @param permission Node to add/remove
-     * @param add True if node is to be added, false if it is to be removed
+     * 
+     * @param permission
+     *            Node to add/remove
+     * @param add
+     *            True if node is to be added, false if it is to be removed
      */
     public void setPermission(final String permission, final boolean add) {
         if (add)
@@ -253,7 +274,9 @@ public abstract class Entry {
 
     /**
      * Adds a permission to this entry.
-     * @param permission Permission to add
+     * 
+     * @param permission
+     *            Permission to add
      */
     public void addPermission(final String permission) {
         clearCacheNode(permission);
@@ -264,7 +287,9 @@ public abstract class Entry {
 
     /**
      * Removes a permission from this entry.
-     * @param permission Permission to remove
+     * 
+     * @param permission
+     *            Permission to remove
      */
     public void removePermission(final String permission) {
         clearCacheNode(permission);
@@ -275,7 +300,9 @@ public abstract class Entry {
 
     /**
      * Adds a group to this entry's parent list.
-     * @param group Group to add
+     * 
+     * @param group
+     *            Group to add
      */
     public void addParent(Group group) {
         groupClearCache();
@@ -286,7 +313,9 @@ public abstract class Entry {
 
     /**
      * Removes a group from this entry's parent list.
-     * @param group Group to remove
+     * 
+     * @param group
+     *            Group to remove
      */
     public void removeParent(Group group) {
         groupClearCache();
@@ -297,7 +326,9 @@ public abstract class Entry {
 
     /**
      * Checks this entry and its ancestors for the specified permission
-     * @param permission Node to check for
+     * 
+     * @param permission
+     *            Node to check for
      * @return Whether this entry has that permission
      */
     public boolean hasPermission(String permission) {
@@ -306,40 +337,45 @@ public abstract class Entry {
         CheckResult cr = has(permission, relevantPerms(permission), new LinkedHashSet<Entry>(), world);
         return cr.getResult();
     }
-    
+
     /**
      * This method is called to update the cache when a node is added/removed.
+     * 
      * @param node
      */
     private void clearCacheNode(String node) {
-        if(node == null)
+        if (node == null)
             return;
         CheckResult cr = cache.remove(node);
-        if(cr != null)
+        if (cr != null)
             cr.invalidate();
     }
-    
+
     /**
-     * Checks this entry and its ancestors for the specified permission, 
-     * and returns a CheckResult object containing more info about the result than hasPermission() provides.
+     * Checks this entry and its ancestors for the specified permission, and returns a CheckResult object containing more info about the result than hasPermission() provides.
+     * 
      * @see CheckResult
-     * @param node Node to check for
+     * @param node
+     *            Node to check for
      * @return Results of the check
      */
     public CheckResult has(String node) {
         if (node == null)
             return null;
-        return has(node, relevantPerms(node), new LinkedHashSet<Entry>(), world);        
+        return has(node, relevantPerms(node), new LinkedHashSet<Entry>(), world);
     }
 
     /**
-     * Permission checking algorithm. 
-     * Impl notes: Currently, this uses a DFS. Also, an entry can inherit from a parent multiple times,
-     * as long as the "path" taken to reach that parent is different. 
-     * @param node Node to check for
-     * @param relevant Precomputed set containing relevant nodes
-     * @param checked Set containing the inheritance "path" taken to reach this entry
-     * @param world Specialising world
+     * Permission checking algorithm. Impl notes: Currently, this uses a DFS. Also, an entry can inherit from a parent multiple times, as long as the "path" taken to reach that parent is different.
+     * 
+     * @param node
+     *            Node to check for
+     * @param relevant
+     *            Precomputed set containing relevant nodes
+     * @param checked
+     *            Set containing the inheritance "path" taken to reach this entry
+     * @param world
+     *            Specialising world
      * @return Result of check
      */
     protected CheckResult has(String node, LinkedHashSet<String> relevant, LinkedHashSet<Entry> checked, String world) {
@@ -349,8 +385,10 @@ public abstract class Entry {
         checked.add(this);
 
         CheckResult cr = cache.get(node);
-        if (cr != null && (!world.equals(cr.getWorld()) || !cr.isValid())) {
-            cr = null;
+        if(cr != null) {
+            if (!(world.equals(cr.getWorld()) && cr.isValid())) {
+                cr = null;
+            }
         }
 
         boolean skipCache = false;
@@ -360,7 +398,7 @@ public abstract class Entry {
             Set<String> perms = this.getPermissions();
             for (String mrn : relevant) {
                 if (perms.contains(mrn)) {
-                    skipCache = timedPerms.containsKey(mrn);
+                    skipCache = timedPerms.containsKey(mrn) || transientPerms.contains(mrn);
                     cr = new CheckResult(this, mrn, this, node, world, skipCache);
                     break;
                 }
@@ -392,7 +430,9 @@ public abstract class Entry {
 
     /**
      * Caches a CheckResult.
-     * @param cr CheckResult to cache.
+     * 
+     * @param cr
+     *            CheckResult to cache.
      */
     protected void cache(CheckResult cr) {
         if (cr == null || cr.getNode() == null || cr.shouldSkipCache() || !cr.isValid())
@@ -402,7 +442,9 @@ public abstract class Entry {
 
     /**
      * Checks whether this entry inherits from the given entry.
-     * @param entry Possible parent entry
+     * 
+     * @param entry
+     *            Possible parent entry
      * @return True if this entry inherits from the given entry, false otherwise.
      */
     public boolean isChildOf(final Entry entry) {
@@ -421,6 +463,7 @@ public abstract class Entry {
 
     /**
      * Checks whether this entry inherits from a group that matches the given worldname-groupname pair.
+     * 
      * @return True if this entry has a parent group that matches that pair, false otherwise.
      * @return
      */
@@ -438,6 +481,7 @@ public abstract class Entry {
 
     /**
      * Returns a set containing all permissions, including inherited ones.
+     * 
      * @return
      */
     public Set<String> getAllPermissions() {
@@ -445,10 +489,12 @@ public abstract class Entry {
     }
 
     /**
-     * This method combines the permissions inherited from parents
-     * and this entry's own permissions and returns the result.
-     * @param chain Set containing the inheritance "path" taken to reach this entry
-     * @param world Specialising world
+     * This method combines the permissions inherited from parents and this entry's own permissions and returns the result.
+     * 
+     * @param chain
+     *            Set containing the inheritance "path" taken to reach this entry
+     * @param world
+     *            Specialising world
      * @return
      */
     protected Set<String> getAllPermissions(LinkedHashSet<Entry> chain, String world) {
@@ -476,10 +522,12 @@ public abstract class Entry {
     }
 
     /**
-     * Computes the combination of <tt>perms</tt> and <tt>rawPerms</tt>,
-     * with nodes in <tt>rawPerms</tt> overriding nodes in <tt>perms</tt>.
-     * @param perms Overridable set of permissions
-     * @param rawPerms New permissions to add
+     * Computes the combination of <tt>perms</tt> and <tt>rawPerms</tt>, with nodes in <tt>rawPerms</tt> overriding nodes in <tt>perms</tt>.
+     * 
+     * @param perms
+     *            Overridable set of permissions
+     * @param rawPerms
+     *            New permissions to add
      */
     protected static void resolvePerms(Set<String> perms, Set<String> rawPerms) {
         for (Iterator<String> rawIter = rawPerms.iterator(); rawIter.hasNext();) {
@@ -504,8 +552,8 @@ public abstract class Entry {
     }
 
     /**
-     * Gets the parents of this entry, specialising all ?-world groups into groups with the same world as this entry.
-     * Note that users may inherit from users via world inheritance and/or global permissions.
+     * Gets the parents of this entry, specialising all ?-world groups into groups with the same world as this entry. Note that users may inherit from users via world inheritance and/or global permissions.
+     * 
      * @return Set containing parent entries.
      */
     public LinkedHashSet<Entry> getParents() {
@@ -514,6 +562,7 @@ public abstract class Entry {
 
     /**
      * Identical to getParents() but without specialising ?-world groups.
+     * 
      * @return Set containing parent entries.
      */
     protected LinkedHashSet<Entry> getUnspecialisedParents() {
@@ -521,8 +570,8 @@ public abstract class Entry {
     }
 
     /**
-     * Gets the parents of this entry, specialising all ?-world groups into groups with the provided world.
-     * Note that users may inherit from users via world inheritance and/or global permissions.
+     * Gets the parents of this entry, specialising all ?-world groups into groups with the provided world. Note that users may inherit from users via world inheritance and/or global permissions.
+     * 
      * @return Set containing parent entries.
      */
     public LinkedHashSet<Entry> getParents(String world) {
@@ -530,13 +579,13 @@ public abstract class Entry {
         LinkedHashSet<Entry> parents = new LinkedHashSet<Entry>();
         parents.addAll(groupParents);
         if (!this.world.equals("*")) {
-            Entry global = this.getType() == EntryType.USER ? controller.getUserObject("*", name) : controller.getGroupObject("*", name);
+            Entry global = this.getType() == EntryType.USER ? controller.getUsr("*", name) : controller.getGrp("*", name);
             if (global != null)
                 parents.add(global);
         }
         String parentWorld = controller.getWorldParent(world, this.getType() == EntryType.USER);
         if (parentWorld != null) {
-            Entry inherited = this.getType() == EntryType.USER ? controller.getUserObject(parentWorld, name) : controller.getGroupObject(parentWorld, name);
+            Entry inherited = this.getType() == EntryType.USER ? controller.getUsr(parentWorld, name) : controller.getGrp(parentWorld, name);
             if (inherited != null)
                 parents.add(inherited);
         }
@@ -545,6 +594,7 @@ public abstract class Entry {
 
     /**
      * Returns the weight of this entry.
+     * 
      * @return Weight of this entry.
      */
     public int getWeight() {
@@ -554,6 +604,7 @@ public abstract class Entry {
 
     /**
      * Gets the ancestors of this entry, including parents, parents of parents and etc.
+     * 
      * @return Set of this entry's ancestors.
      */
     public LinkedHashSet<Entry> getAncestors() {
@@ -580,6 +631,7 @@ public abstract class Entry {
 
     /**
      * Checks whether a group matches a worldname-groupname pair.
+     * 
      * @author rcjrrjcr
      */
     static class GroupChecker implements EntryVisitor<Boolean> {
@@ -604,8 +656,11 @@ public abstract class Entry {
 
     /**
      * Checks if the user inherits from the group specified by the parameters
-     * @param world World of group
-     * @param group Name of group
+     * 
+     * @param world
+     *            World of group
+     * @param group
+     *            Name of group
      * @return True if user inherits from that group (directly or indirectly), false otherwise
      */
     public boolean inGroup(String world, String group) {
@@ -618,6 +673,7 @@ public abstract class Entry {
 
     /**
      * Checks if entry can build.
+     * 
      * @return Whether entry can build.
      */
     public boolean canBuild() {
@@ -626,15 +682,13 @@ public abstract class Entry {
     }
 
     /**
-     * This method traverses the inheritance tree (postorder traversal),
-     * and for every entry in the inheritance tree, the visitor's <tt>value()</tt> method is called.
-     * The visitor should return a non-null value to halt traversal, and a null value to continue to the next entry.
-     * When traversal is halted abruptly, the non-null value returned by the visitor will be returned by this method.
-     * When traversal completes without the visitor returning a non-null value, null will be returned.
-     * @param <T> Return value of visitor
-     * @param visitor Visitor object
-     * @return Visitor's first non-null return value, or null if
-     * traversal completes without any non-null values returned by the visitor.
+     * This method traverses the inheritance tree (postorder traversal), and for every entry in the inheritance tree, the visitor's <tt>value()</tt> method is called. The visitor should return a non-null value to halt traversal, and a null value to continue to the next entry. When traversal is halted abruptly, the non-null value returned by the visitor will be returned by this method. When traversal completes without the visitor returning a non-null value, null will be returned.
+     * 
+     * @param <T>
+     *            Return value of visitor
+     * @param visitor
+     *            Visitor object
+     * @return Visitor's first non-null return value, or null if traversal completes without any non-null values returned by the visitor.
      */
     public <T> T recursiveCheck(EntryVisitor<T> visitor) {
         return recursiveCheck(new LinkedHashSet<Entry>(), visitor, world);
@@ -667,12 +721,14 @@ public abstract class Entry {
     }
 
     /**
-     * This method is similar to recursiveCheck, but this instead returns the 
-     * largest value (according to the comparator) returned by the visitor.
-     * If a non-null value is returned for an entry, that entry's parents will not be visited.
-     * @param <T> Return type
-     * @param visitor Visitor object
-     * @param comparator Comparator used to compare visitor return values
+     * This method is similar to recursiveCheck, but this instead returns the largest value (according to the comparator) returned by the visitor. If a non-null value is returned for an entry, that entry's parents will not be visited.
+     * 
+     * @param <T>
+     *            Return type
+     * @param visitor
+     *            Visitor object
+     * @param comparator
+     *            Comparator used to compare visitor return values
      * @return Largest value found by a visitor.
      */
     public <T> T recursiveCompare(EntryVisitor<T> visitor, Comparator<T> comparator) {
@@ -710,18 +766,24 @@ public abstract class Entry {
 
     /**
      * Abstract function implemented by subclasses to return the type of entry it represents.
+     * 
      * @return Type of entry (user, group)
      */
     public abstract EntryType getType();
 
     /**
      * Returns the name of this entry.
+     * 
      * @return Name
      */
     public String getName() {
         return name;
     }
 
+    /**
+     * Returns the name of the world this entry belongs to.
+     * @return World name
+     */
     public String getWorld() {
         return world;
     }
@@ -831,8 +893,7 @@ public abstract class Entry {
         /**
          * This is the method called by the recursive checker when searching for a value. If the recursion is to be stopped, return a non-null value.
          * 
-         * @param g
-         *            Group to test
+         * @param g Group to test
          * @return Null if recursion should continue, any applicable value otherwise
          */
         T value(Entry e);

@@ -59,6 +59,8 @@ public final class StorageFactory {
         autosave = config.getBoolean("permissions.storage.autosave", true);
 
         StorageCreator creator;
+//        System.out.println(userWorldType);
+        
         if (userWorldType == null)
             creator = defaultCreator;
         else
@@ -75,6 +77,7 @@ public final class StorageFactory {
         try {
             us = creator.getUserStorage(userWorld, reload, autosave, config);
         } catch (Exception e) {
+            e.printStackTrace();
             if (creator == defaultCreator) {
                 throw e;
             }
@@ -128,6 +131,7 @@ public final class StorageFactory {
         try {
             gs = creator.getGroupStorage(groupWorld, reload, autosave, config);
         } catch (Exception e) {
+            e.printStackTrace();
             if (creator == defaultCreator) {
                 throw e;
             }

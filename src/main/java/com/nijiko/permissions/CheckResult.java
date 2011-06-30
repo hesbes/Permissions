@@ -36,16 +36,11 @@ class CheckResult {
     /**
      * Validity of this result
      */
-    private boolean valid = true;
+    private volatile boolean valid = true;
     /**
      * Parent result, which this result was derived from using setChecked
      */
     private final CheckResult parent;
-
-    /**
-     * Object used to synch access to the validity of this CheckResult object
-     */
-    private final Object lock = new Object();
 
     public CheckResult(Entry source, String relevantNode, Entry checked, String node, String world, boolean skipCache) {
         this(source, relevantNode, checked, node, world, skipCache, null);
@@ -125,10 +120,7 @@ class CheckResult {
         b.append(" , MRN: ").append(relevantNode);
         b.append(" , World: ").append(world);
         b.append(" , SkipCache: ").append(skipCache);
-        b.append(" , Valid: ");
-        synchronized (lock) {
-            b.append(valid);
-        }
+        b.append(" , Valid: ").append(valid);
         return b.toString();
     }
 
@@ -154,30 +146,31 @@ class CheckResult {
     /**
      * Invalidates this result and all child instances.
      */
+    
+    /* XXX: Does the semantics of volatile allow multiple threads to call this function?
+     * The only possible transition is from true->false, so it should. However, if there is ever
+     * a false->true state transition outside the constructor, change volatile to an AtomicBoolean.
+     */
     public void invalidate() {
-        synchronized (lock) {
-            valid = false;
-        }
+        valid = false;
     }
 
     /**
      * This checks whether this or any parent instance has been invalidated.
      * @return Whether the results provided by this instance is valid
      */
-    //Possible infinite recursion! However, Entry.has() prevents cycles. Other sources may not be safe.
+    // Possible infinite recursion! However, Entry.has() prevents cycles. Other sources may not be safe.
     public boolean isValid() {
-        synchronized (lock) {
-            if (!valid)
+        if (!valid)
+            return false;
+        else if (parent != null) {
+            if (parent.isValid())
+                return true;
+            else {
+                valid = false;
                 return false;
-            else if (parent != null) {
-                if (parent.isValid())
-                    return true;
-                else {
-                    valid = false;
-                    return false;
-                }
             }
-            return true;
         }
+        return true;
     }
 }
