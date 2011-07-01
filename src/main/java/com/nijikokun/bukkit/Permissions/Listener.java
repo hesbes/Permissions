@@ -41,7 +41,7 @@ public class Listener extends BlockListener {
 
         world = player.getWorld();
         try {
-            if (Permissions.Security.safeGetUser(world.getName(),
+            if (((Permissions) Permissions.instance).getHandler().safeGetUser(world.getName(),
                     player.getName()).canBuild())
                 return;
         } catch (Exception e) {
@@ -59,7 +59,7 @@ public class Listener extends BlockListener {
 
         world = player.getWorld();
         try {
-            if (Permissions.Security.safeGetUser(world.getName(),
+            if (((Permissions) Permissions.instance).getHandler().safeGetUser(world.getName(),
                     player.getName()).canBuild())
                 return;
         } catch (Exception e) {

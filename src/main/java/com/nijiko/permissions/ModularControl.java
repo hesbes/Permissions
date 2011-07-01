@@ -133,6 +133,7 @@ public class ModularControl extends PermissionHandler {
 
     @Override
     public void reload() {
+        loadWorldInheritance();
         storageReload();
         for (PermissionWorld w : worlds.values()) {
             w.reload();

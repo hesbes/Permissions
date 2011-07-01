@@ -36,9 +36,9 @@ public class CommandManager implements CommandExecutor {
 
         return handler.onCommand(holder, sender, msg);
     }
-    
+
     public void registerCommand(String commandName, CommandHandler handler) {
-        //XXX: putIfAbsent?
+        // XXX: putIfAbsent?
         dispatchMap.put(commandName, handler);
     }
 
@@ -49,7 +49,7 @@ public class CommandManager implements CommandExecutor {
     static Group getGroup(String world, String name, boolean create) {
         PermissionHandler handler = getHandler();
         Group g;
-        if (create) {
+        if (!create) {
             g = handler.getGroupObject(world, name);
         } else {
             try {
@@ -61,11 +61,11 @@ public class CommandManager implements CommandExecutor {
         }
         return g;
     }
-    
+
     static User getUser(String world, String name, boolean create) {
         PermissionHandler handler = getHandler();
         User u;
-        if (create) {
+        if (!create) {
             u = handler.getUserObject(world, name);
         } else {
             try {
@@ -76,7 +76,7 @@ public class CommandManager implements CommandExecutor {
             }
         }
         return u;
-    }    
+    }
 
     static TextFormEntry extractEntry(ArgumentHolder holder) {
         String name = holder.getNextArgument();
@@ -145,7 +145,7 @@ public class CommandManager implements CommandExecutor {
         private int index = -1;
 
         public ArgumentHolder(String[] args) {
-            this.args = args;
+            this.args = args.clone();
         }
 
         public String getNextArgument() {
@@ -177,9 +177,9 @@ public class CommandManager implements CommandExecutor {
             private final String[] args;
             private int index = -1;
 
-//            public ArrayIterator(String[] args) {
-//                this.args = args;
-//            }
+            // public ArrayIterator(String[] args) {
+            // this.args = args;
+            // }
 
             public ArrayIterator(String[] args, int index) {
                 this.args = args;
@@ -234,6 +234,7 @@ public class CommandManager implements CommandExecutor {
     static <T> void list(MessageHelper msg, Collection<T> coll, String prefix, String emptyMessage, StringConverter<? super T> converter) {
         list(msg, coll, prefix, emptyMessage, converter, "&b,&c ");
     }
+
     static <T> void list(MessageHelper msg, Collection<T> coll, String prefix, String emptyMessage, StringConverter<? super T> converter, String separator) {
         if (msg == null)
             return;
@@ -259,14 +260,15 @@ public class CommandManager implements CommandExecutor {
 
         msg.send(sb.toString());
     }
-    
+
     static <T> Set<String> asStringSet(Collection<T> coll, StringConverter<? super T> converter) {
         Set<String> stringSet = new LinkedHashSet<String>();
-        for(T obj : coll) {
+        for (T obj : coll) {
             stringSet.add(converter.convertToString(obj));
         }
         return stringSet;
     }
+
     static String getClosest(String word, Set<String> dict, final int threshold) {
         if (word == null || word.isEmpty() || dict == null || dict.isEmpty()) {
             return null;
@@ -292,6 +294,7 @@ public class CommandManager implements CommandExecutor {
         }
         return result;
     }
+
     public static interface StringConverter<T> {
         public String convertToString(T o);
     }

@@ -8,7 +8,7 @@ public class PrWorldListener extends WorldListener {
     @Override
     public void onWorldLoad(WorldLoadEvent event) {
         try {
-            Permissions.Security.loadWorld(event.getWorld().getName());
+            ((Permissions) Permissions.instance).getHandler().loadWorld(event.getWorld().getName());
         } catch (Exception e) {
             e.printStackTrace();
         }

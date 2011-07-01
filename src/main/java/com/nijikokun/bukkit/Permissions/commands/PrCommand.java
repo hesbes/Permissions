@@ -164,7 +164,7 @@ public class PrCommand implements CommandHandler {
         }
 
         try {
-            CommandManager.getHandler().loadWorld(world);
+            CommandManager.getHandler().forceLoadWorld(world);
         } catch (Exception e) {
             msg.send("&4[Permissions] Error occured while loading world.");
             e.printStackTrace();

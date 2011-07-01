@@ -41,12 +41,12 @@ public class PermissionWorld {
 
         Map<String, Group> oldGroups = groups;
         Map<String, Group> newGroups = new HashMap<String, Group>();
-        
+
         Set<String> groupNames = groupStore.getEntries();
         for (String groupName : groupNames) {
             Group group = new Group(groupStore, groupName, this, false);
             Group oldGroup = oldGroups.get(groupName.toLowerCase());
-            if(oldGroup != null) {
+            if (oldGroup != null) {
                 group.copyTimedMap(oldGroup);
             }
             newGroups.put(groupName.toLowerCase(), group);
@@ -55,15 +55,15 @@ public class PermissionWorld {
         }
         groups = newGroups;
         oldGroups = null;
-        
+
         Map<String, User> oldUsers = users;
         Map<String, User> newUsers = new HashMap<String, User>();
-        
+
         Set<String> userNames = userStore.getEntries();
         for (String userName : userNames) {
             User user = new User(userStore, userName, this, false);
             User oldUser = oldUsers.get(userName.toLowerCase());
-            if(oldUser != null) {
+            if (oldUser != null) {
                 user.copyTimedMap(oldUser);
             }
             newUsers.put(userName.toLowerCase(), user);
@@ -74,32 +74,32 @@ public class PermissionWorld {
         Permissions.instance.getServer().getPluginManager().callEvent(new WorldConfigLoadEvent(world));
         return true;
     }
-    
+
     public void minorReload() {
         if (userStore != null)
             userStore.reload();
         if (groupStore != null)
             groupStore.reload();
-        
-        for(User u : users.values()) {
+
+        for (User u : users.values()) {
             u.clearTransientPerms();
             u.clearCache();
         }
-        for(Group g : groups.values()) {
+        for (Group g : groups.values()) {
             g.clearTransientPerms();
             g.clearCache();
         }
     }
-    
-    public void clearCaches() {        
-        for(User u : users.values()) {
+
+    public void clearCaches() {
+        for (User u : users.values()) {
             u.clearCache();
         }
-        for(Group g : groups.values()) {
+        for (Group g : groups.values()) {
             g.clearCache();
-        }        
+        }
     }
-    
+
     public void save() {
         if (userStore != null)
             userStore.forceSave();
@@ -186,22 +186,22 @@ public class PermissionWorld {
     public String getWorldName() {
         return world;
     }
-    
+
     void tick(long interval) {
-        for(User u : users.values())
+        for (User u : users.values())
             u.tick(interval);
     }
-    
+
     @Override
     public String toString() {
         return "PermissionWorld " + world;
     }
-    
-    //Methods used by Entry to wrap calls to ModularControl
+
+    // Methods used by Entry to wrap calls to ModularControl
     void clearAllCaches() {
         controller.clearAllCaches();
     }
-    
+
     LinkedHashSet<Group> stringToGroups(LinkedHashSet<GroupWorld> raws, String overrideWorld) {
         LinkedHashSet<Group> groupSet = new LinkedHashSet<Group>();
         if (raws == null)
@@ -217,40 +217,43 @@ public class PermissionWorld {
         }
         return groupSet;
     }
-    
+
     PermissionWorld getWorldParent(boolean isUser) {
+        String parentName = controller.getWorldParent(world, isUser);
+        if(parentName == null)
+            return null;
         try {
-            return controller.safeGetWorld(controller.getWorldParent(world, isUser));
+            return controller.safeGetWorld(parentName);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
-    
+
     User getUsr(String world, String name) {
-        if(this.world.equals(world)) {
+        if (this.world.equals(world)) {
             return this.getUsr(name);
         }
         return controller.getUsr(world, name);
     }
-    
+
     Group getGrp(String world, String name) {
-        if(this.world.equals(world)) {
+        if (this.world.equals(world)) {
             return this.getGrp(name);
         }
         return controller.getGrp(world, name);
     }
-    
+
     User getUsr(String name) {
         return this.safeGetUser(name);
     }
-    
+
     Group getGrp(String name) {
         return this.safeGetGroup(name);
     }
 
-    User getUserObject(String string, String name) {
-        if(this.world.equals(world)) {
+    User getUserObject(String world, String name) {
+        if (this.world.equals(world)) {
             return this.getUserObject(name);
         }
         return controller.getUserObject(world, name);

@@ -3,14 +3,9 @@ package com.nijikokun.bukkit.Permissions;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Properties;
-import java.util.Set;
 import java.util.logging.Logger;
 
-import org.bukkit.ChatColor;
 import org.bukkit.World;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandSender;
@@ -24,14 +19,10 @@ import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.util.config.Configuration;
 
 import com.nijiko.MessageHelper;
-import com.nijiko.data.GroupWorld;
 import com.nijiko.data.StorageFactory;
 import com.nijiko.data.YamlCreator;
-import com.nijiko.permissions.Entry;
-import com.nijiko.permissions.Group;
 import com.nijiko.permissions.ModularControl;
 import com.nijiko.permissions.PermissionHandler;
-import com.nijiko.permissions.User;
 import com.nijikokun.bukkit.Permissions.commands.CommandManager;
 import com.nijikokun.bukkit.Permissions.commands.PrCommand;
 
@@ -66,9 +57,7 @@ public class Permissions extends JavaPlugin {
     // private PermissionHandler controller;
 
     private String defaultWorld = "";
-    private static final boolean autoComplete = true;
     private final YamlCreator yamlC;
-    private int dist = 10;
     private final PrWorldListener wListener = new PrWorldListener();
 
     private boolean errorFlag = false;
