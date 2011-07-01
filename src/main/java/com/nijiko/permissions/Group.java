@@ -10,8 +10,8 @@ public class Group extends Entry {
 
     private GroupStorage data;
 
-    Group(ModularControl controller, GroupStorage data, String name, PermissionWorld worldObj, boolean create) {
-        super(controller, name, worldObj);
+    Group(GroupStorage data, String name, PermissionWorld worldObj, boolean create) {
+        super(name, worldObj);
         this.data = data;
         if (create && !world.equals("?")) {
             System.out.println("Creating group " + name);
@@ -54,5 +54,10 @@ public class Group extends Entry {
     
     public GroupWorld toGroupWorld() {
         return new GroupWorld(world, name);
+    }
+    
+    @Override
+    public String toStringNameOnly() {
+        return "Group " + name;
     }
 }

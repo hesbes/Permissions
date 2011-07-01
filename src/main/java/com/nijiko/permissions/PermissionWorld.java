@@ -2,10 +2,12 @@ package com.nijiko.permissions;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 
 import com.nijiko.data.GroupStorage;
+import com.nijiko.data.GroupWorld;
 import com.nijiko.data.UserStorage;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
@@ -42,7 +44,7 @@ public class PermissionWorld {
         
         Set<String> groupNames = groupStore.getEntries();
         for (String groupName : groupNames) {
-            Group group = new Group(controller, groupStore, groupName, this, false);
+            Group group = new Group(groupStore, groupName, this, false);
             Group oldGroup = oldGroups.get(groupName.toLowerCase());
             if(oldGroup != null) {
                 group.copyTimedMap(oldGroup);
@@ -59,7 +61,7 @@ public class PermissionWorld {
         
         Set<String> userNames = userStore.getEntries();
         for (String userName : userNames) {
-            User user = new User(controller, userStore, userName, this, false);
+            User user = new User(userStore, userName, this, false);
             User oldUser = oldUsers.get(userName.toLowerCase());
             if(oldUser != null) {
                 user.copyTimedMap(oldUser);
@@ -116,7 +118,7 @@ public class PermissionWorld {
     public User safeGetUser(String name) {
         User u = users.get(name.toLowerCase());
         if (u == null) {
-            u = new User(controller, userStore, name, this, true);
+            u = new User(userStore, name, this, true);
             users.put(name.toLowerCase(), u);
         }
         return u;
@@ -125,7 +127,7 @@ public class PermissionWorld {
     public Group safeGetGroup(String name) {
         Group g = groups.get(name.toLowerCase());
         if (g == null) {
-            g = new Group(controller, groupStore, name, this, true);
+            g = new Group(groupStore, name, this, true);
             groups.put(name.toLowerCase(), g);
         }
         return g;
@@ -193,5 +195,64 @@ public class PermissionWorld {
     @Override
     public String toString() {
         return "PermissionWorld " + world;
+    }
+    
+    //Methods used by Entry to wrap calls to ModularControl
+    void clearAllCaches() {
+        controller.clearAllCaches();
+    }
+    
+    LinkedHashSet<Group> stringToGroups(LinkedHashSet<GroupWorld> raws, String overrideWorld) {
+        LinkedHashSet<Group> groupSet = new LinkedHashSet<Group>();
+        if (raws == null)
+            return groupSet;
+        for (GroupWorld raw : raws) {
+            String rawWorld = raw.getWorld();
+            if (rawWorld.equals("?") && overrideWorld != null) {
+                rawWorld = overrideWorld;
+            }
+            Group g = this.getGrp(rawWorld, raw.getName());
+            if (g != null)
+                groupSet.add(g);
+        }
+        return groupSet;
+    }
+    
+    PermissionWorld getWorldParent(boolean isUser) {
+        try {
+            return controller.safeGetWorld(controller.getWorldParent(world, isUser));
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    
+    User getUsr(String world, String name) {
+        if(this.world.equals(world)) {
+            return this.getUsr(name);
+        }
+        return controller.getUsr(world, name);
+    }
+    
+    Group getGrp(String world, String name) {
+        if(this.world.equals(world)) {
+            return this.getGrp(name);
+        }
+        return controller.getGrp(world, name);
+    }
+    
+    User getUsr(String name) {
+        return this.safeGetUser(name);
+    }
+    
+    Group getGrp(String name) {
+        return this.safeGetGroup(name);
+    }
+
+    User getUserObject(String string, String name) {
+        if(this.world.equals(world)) {
+            return this.getUserObject(name);
+        }
+        return controller.getUserObject(world, name);
     }
 }

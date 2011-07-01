@@ -12,8 +12,8 @@ import com.nijiko.data.UserStorage;
 public class User extends Entry {
     private UserStorage data;
 
-    User(ModularControl controller, UserStorage data, String name, PermissionWorld worldObj, boolean create) {
-        super(controller, name, worldObj);
+    User(UserStorage data, String name, PermissionWorld worldObj, boolean create) {
+        super(name, worldObj);
         this.data = data;
         if (create && !world.equals("?")) {
             System.out.println("Creating user " + name);
@@ -24,7 +24,7 @@ public class User extends Entry {
             Group g = worldObj.getDefaultGroup();
             if (g != null) {
                 if (this.world.equals("*")) {
-                    Group qDef = controller.getGrp("?", g.name);
+                    Group qDef = worldObj.getGrp("?", g.name);
                     if (qDef != null)
                         this.addParent(qDef);
                 } else
@@ -36,7 +36,7 @@ public class User extends Entry {
 
     private boolean addDefault() {
         if (this.getRawParents().isEmpty()) {
-            User u = this.controller.getUserObject("*", name);
+            User u = this.worldObj.getUserObject("*", name);
             if (u != null) {
                 LinkedHashSet<GroupWorld> gwSet = u.getRawParents();
                 for (GroupWorld gw : gwSet) {
@@ -109,7 +109,7 @@ public class User extends Entry {
                 this.removeParent(g);
                 if (iter.hasPrevious()) {
                     GroupWorld prev = iter.previous();
-                    this.addParent(controller.getGrp(prev.getWorld(), prev.getName()));
+                    this.addParent(worldObj.getGrp(prev.getWorld(), prev.getName()));
                 }
                 return true;
             }
@@ -132,7 +132,7 @@ public class User extends Entry {
             if (iter.hasNext()) {
                 GroupWorld gw = iter.next();
                 if (gw != null)
-                    this.addParent(controller.getGrp(gw.getWorld(), gw.getName()));
+                    this.addParent(worldObj.getGrp(gw.getWorld(), gw.getName()));
             }
             return false;
         }
@@ -144,7 +144,7 @@ public class User extends Entry {
                 if (iter.hasNext()) {
                     GroupWorld next = iter.next();
                     this.removeParent(g);
-                    this.addParent(controller.getGrp(next.getWorld(), next.getName()));
+                    this.addParent(worldObj.getGrp(next.getWorld(), next.getName()));
                     return true;
                 }
             }
@@ -161,5 +161,10 @@ public class User extends Entry {
     public boolean delete() {
         worldObj.delUsr(name);
         return super.delete();
+    }
+    
+    @Override
+    public String toStringNameOnly() {
+        return "User " + name;
     }
 }

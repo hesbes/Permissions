@@ -3,10 +3,8 @@ package com.nijiko.permissions;
 import java.io.Serializable;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-//import java.util.Collections;
 import java.util.Comparator;
 import java.util.Deque;
-//import java.util.HashMap;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -28,7 +26,6 @@ import com.nijiko.data.Storage;
  */
 public abstract class Entry {
 
-    protected ModularControl controller;
     protected PermissionWorld worldObj;
     protected String name;
     protected String world;
@@ -36,8 +33,7 @@ public abstract class Entry {
     protected Set<String> transientPerms = new HashSet<String>();
     private final ConcurrentMap<String, Long> timedPerms = new ConcurrentHashMap<String, Long>();
 
-    protected Entry(ModularControl controller, String name, PermissionWorld worldObj) {
-        this.controller = controller;
+    protected Entry(String name, PermissionWorld worldObj) {
         this.name = name;
         this.world = worldObj.getWorldName();
         this.worldObj = worldObj;
@@ -58,7 +54,7 @@ public abstract class Entry {
      * Or should there be a getChildren() function?
      */
     private void groupClearCache() {
-        controller.clearAllCaches();
+        worldObj.clearAllCaches();
     }
 
     /**
@@ -586,17 +582,17 @@ public abstract class Entry {
      * @return Set containing parent entries.
      */
     public LinkedHashSet<Entry> getParents(String world) {
-        LinkedHashSet<Group> groupParents = controller.stringToGroups(getRawParents(), world);
+        LinkedHashSet<Group> groupParents = worldObj.stringToGroups(getRawParents(), world);
         LinkedHashSet<Entry> parents = new LinkedHashSet<Entry>();
         parents.addAll(groupParents);
         if (!this.world.equals("*")) {
-            Entry global = this.getType() == EntryType.USER ? controller.getUsr("*", name) : controller.getGrp("*", name);
+            Entry global = this.getType() == EntryType.USER ? worldObj.getUsr("*", name) : worldObj.getGrp("*", name);
             if (global != null)
                 parents.add(global);
         }
-        String parentWorld = controller.getWorldParent(world, this.getType() == EntryType.USER);
+        PermissionWorld parentWorld = worldObj.getWorldParent(this.getType() == EntryType.USER);
         if (parentWorld != null) {
-            Entry inherited = this.getType() == EntryType.USER ? controller.getUsr(parentWorld, name) : controller.getGrp(parentWorld, name);
+            Entry inherited = this.getType() == EntryType.USER ? parentWorld.getUsr(name) : parentWorld.getGrp(name);
             if (inherited != null)
                 parents.add(inherited);
         }
@@ -803,6 +799,10 @@ public abstract class Entry {
     public String toString() {
         return "Entry " + name + " in " + world;
     }
+    
+    public String toStringNameOnly() {
+        return "Entry " + name;
+    }
 
     public void setData(String path, Object data) {
         Storage store = getStorage();
@@ -864,7 +864,7 @@ public abstract class Entry {
     public static final class DoubleInfoVisitor implements EntryVisitor<Double> {
         private final String path;
 
-        protected DoubleInfoVisitor(String path) {
+        public DoubleInfoVisitor(String path) {
             this.path = path;
         }
 
@@ -890,7 +890,7 @@ public abstract class Entry {
     public static final class StringInfoVisitor implements EntryVisitor<String> {
         private final String path;
 
-        private StringInfoVisitor(String path) {
+        public StringInfoVisitor(String path) {
             this.path = path;
         }
 

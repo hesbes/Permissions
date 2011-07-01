@@ -36,6 +36,10 @@ public abstract class NullStorage implements Storage {
     @Override
     public void removeParent(String name, String groupWorld, String groupName) {
     }
+    
+    @Override
+    public void setParents(String name, LinkedHashSet<GroupWorld> groupWs) {        
+    }
 
     @Override
     public Set<String> getEntries() {

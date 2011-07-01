@@ -219,7 +219,7 @@ public class ModularControl extends PermissionHandler {
     }
 
     String getWorldParent(String world, boolean user) {
-        return user ? userStorageInheritance.containsKey(world) ? userStorageInheritance.get(world) : null : groupStorageInheritance.containsKey(world) ? groupStorageInheritance.get(world) : null;
+        return user ? userStorageInheritance.get(world) : groupStorageInheritance.get(world);
     }
 
     @Override

@@ -5,6 +5,7 @@ import java.util.Set;
 
 import com.nijiko.permissions.EntryType;
 
+//TODO: Make operations atomic in subclasses or Entry
 public interface Storage {
 
     public Set<String> getPermissions(String name);

@@ -1,5 +1,6 @@
 package com.nijiko.data;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -128,6 +129,27 @@ public class YamlGroupStorage implements GroupStorage {
         } finally {
             rwl.writeLock().unlock();
         }
+    }
+    
+    @Override
+    public void setParents(String name, LinkedHashSet<GroupWorld> groupWs) {
+        name = name.replace('.', ','); // Fix for legacy usernames with periods
+        rwl.writeLock().lock();
+        try {
+            List<String> parents = new ArrayList<String>(groupWs.size());
+            for(GroupWorld gw : groupWs) {
+                if(world.equals(gw.getWorld())) {
+                    parents.add(gw.getName());
+                } else {
+                    parents.add(gw.getWorld() + "," + gw.getName());                    
+                }
+            }
+            groupConfig.setProperty("groups." + name + ".inheritance", new LinkedList<String>(parents));
+            modified = true;
+            save();
+        } finally {
+            rwl.writeLock().unlock();
+        }        
     }
 
     @Override

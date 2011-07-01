@@ -3,7 +3,9 @@ package com.nijikokun.bukkit.Permissions.commands;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.Map;
+import java.util.Set;
 
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -12,7 +14,9 @@ import org.bukkit.entity.Player;
 
 import com.nijiko.MessageHelper;
 import com.nijiko.permissions.Entry;
+import com.nijiko.permissions.Group;
 import com.nijiko.permissions.PermissionHandler;
+import com.nijiko.permissions.User;
 import com.nijikokun.bukkit.Permissions.Permissions;
 
 public class CommandManager implements CommandExecutor {
@@ -32,39 +36,58 @@ public class CommandManager implements CommandExecutor {
 
         return handler.onCommand(holder, sender, msg);
     }
-
-    public static Entry extractEntryObject(ArgumentHolder holder, boolean create) {
-        TextFormEntry strE = extractEntry(holder);
-
-        PermissionHandler handler = getHandler();
-
-        Entry e;
-        if (strE.isGroup()) {
-            try {
-                e = create ? handler.safeGetGroup(strE.getWorld(), strE.getName()) : handler.getGroupObject(strE.getWorld(), strE.getName());
-            } catch (Exception e1) {
-                e1.printStackTrace();
-                e = null;
-            }
-        } else {
-            try {
-                e = create ? handler.safeGetUser(strE.getWorld(), strE.getName()) : handler.getUserObject(strE.getWorld(), strE.getName());
-            } catch (Exception e1) {
-                e1.printStackTrace();
-                e = null;
-            }
-        }
-
-        return e;
+    
+    public void registerCommand(String commandName, CommandHandler handler) {
+        //XXX: putIfAbsent?
+        dispatchMap.put(commandName, handler);
     }
 
-    public static TextFormEntry extractEntry(ArgumentHolder holder) {
+    static Entry getEntry(String world, String name, boolean isGroup, boolean create) {
+        return isGroup ? getGroup(world, name, create) : getUser(world, name, create);
+    }
+
+    static Group getGroup(String world, String name, boolean create) {
+        PermissionHandler handler = getHandler();
+        Group g;
+        if (create) {
+            g = handler.getGroupObject(world, name);
+        } else {
+            try {
+                g = handler.safeGetGroup(world, name);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+                g = null;
+            }
+        }
+        return g;
+    }
+    
+    static User getUser(String world, String name, boolean create) {
+        PermissionHandler handler = getHandler();
+        User u;
+        if (create) {
+            u = handler.getUserObject(world, name);
+        } else {
+            try {
+                u = handler.safeGetUser(world, name);
+            } catch (Exception e1) {
+                e1.printStackTrace();
+                u = null;
+            }
+        }
+        return u;
+    }    
+
+    static TextFormEntry extractEntry(ArgumentHolder holder) {
         String name = holder.getNextArgument();
         boolean isGroup = name.startsWith("g:");
         if (isGroup)
             name = name.substring(2);
 
-        String world = extractQuoted(holder, "w:");
+        // String world = extractQuoted(holder, "w:");
+        String world = holder.getNextArgument();
+        if (world == null)
+            world = getDefaultWorld();
 
         return new TextFormEntry(world, name, isGroup);
     }
@@ -154,9 +177,9 @@ public class CommandManager implements CommandExecutor {
             private final String[] args;
             private int index = -1;
 
-            public ArrayIterator(String[] args) {
-                this.args = args;
-            }
+//            public ArrayIterator(String[] args) {
+//                this.args = args;
+//            }
 
             public ArrayIterator(String[] args, int index) {
                 this.args = args;
@@ -209,6 +232,9 @@ public class CommandManager implements CommandExecutor {
     }
 
     static <T> void list(MessageHelper msg, Collection<T> coll, String prefix, String emptyMessage, StringConverter<? super T> converter) {
+        list(msg, coll, prefix, emptyMessage, converter, "&b,&c ");
+    }
+    static <T> void list(MessageHelper msg, Collection<T> coll, String prefix, String emptyMessage, StringConverter<? super T> converter, String separator) {
         if (msg == null)
             return;
         if (coll == null || coll.isEmpty()) {
@@ -221,19 +247,51 @@ public class CommandManager implements CommandExecutor {
 
         if (converter == null) {
             for (T o : coll) {
-                sb.append(o).append(" ,");
+                sb.append(o).append(separator);
             }
         } else {
             for (T o : coll) {
-                sb.append(converter.convertToString(o)).append(" ,");
+                sb.append(converter.convertToString(o)).append(separator);
             }
         }
         if (sb.length() >= 2)
-            sb.delete(sb.length() - 2, sb.length());
-        
+            sb.delete(sb.length() - separator.length(), sb.length());
+
         msg.send(sb.toString());
     }
-
+    
+    static <T> Set<String> asStringSet(Collection<T> coll, StringConverter<? super T> converter) {
+        Set<String> stringSet = new LinkedHashSet<String>();
+        for(T obj : coll) {
+            stringSet.add(converter.convertToString(obj));
+        }
+        return stringSet;
+    }
+    static String getClosest(String word, Set<String> dict, final int threshold) {
+        if (word == null || word.isEmpty() || dict == null || dict.isEmpty()) {
+            return null;
+        }
+        if (dict.contains(word)) {
+            return word;
+        }
+        String result = null;
+        int currentDist = threshold;
+        String lw = word.toLowerCase();
+        for (String s : dict) {
+            if (s == null)
+                continue;
+            String ls = s.toLowerCase();
+            int dist;
+            if (ls.startsWith(lw)) {
+                dist = s.length() - word.length();
+                if (currentDist > dist) {
+                    result = s;
+                    currentDist = dist;
+                }
+            }
+        }
+        return result;
+    }
     public static interface StringConverter<T> {
         public String convertToString(T o);
     }
