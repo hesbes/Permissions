@@ -102,7 +102,7 @@ public class ModularControl extends PermissionHandler {
     public void forceLoadWorld(String world) throws Exception {
         if(world == null)
             return;
-        boolean q = world.equals("?");
+        boolean q = "?".equals(world);
         UserStorage userStore = q ? new NullUserStorage(world) : StorageFactory.getUserStorage(world, storageConfig);
         GroupStorage groupStore = q ? new NullGroupStorage(world) : StorageFactory.getGroupStorage(world, storageConfig);
         PermissionWorld w = new PermissionWorld(world, this, userStore, groupStore);

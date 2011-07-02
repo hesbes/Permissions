@@ -60,8 +60,11 @@ public class User extends Entry {
     }
 
     public Group getPrimaryGroup() {
-
-        LinkedHashSet<Entry> parents = getParents();
+        return getPrimaryGroup(world);
+    }
+    
+    public Group getPrimaryGroup(String world) {
+        LinkedHashSet<Entry> parents = getParents(world);
 
         if (parents == null || parents.isEmpty())
             return null;
