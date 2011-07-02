@@ -654,7 +654,7 @@ public class PrCommand implements CommandHandler {
         }
 
         if (g == null)
-            g = u.getPrimaryGroup();
+            g = u.getPrimaryGroup(null);
 
         return new GroupTrackPair(g, trackName);
     }
