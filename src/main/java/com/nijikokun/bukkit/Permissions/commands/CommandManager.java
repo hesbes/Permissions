@@ -22,6 +22,7 @@ import com.nijikokun.bukkit.Permissions.Permissions;
 public class CommandManager implements CommandExecutor {
 
     private Map<String, CommandHandler> dispatchMap = new HashMap<String, CommandHandler>();
+    private static Map<CommandSender, String> worldMap = new HashMap<CommandSender, String>();
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
@@ -78,16 +79,16 @@ public class CommandManager implements CommandExecutor {
         return u;
     }
 
-    static TextFormEntry extractEntry(ArgumentHolder holder) {
+    static TextFormEntry extractEntry(CommandSender sender, ArgumentHolder holder, String groupPrefix) {
         String name = holder.getNextArgument();
-        boolean isGroup = name.startsWith("g:");
+        boolean isGroup = name.startsWith(groupPrefix);
         if (isGroup)
             name = name.substring(2);
 
         // String world = extractQuoted(holder, "w:");
         String world = holder.getNextArgument();
         if (world == null)
-            world = getDefaultWorld();
+            world = getWorldFor(sender);
 
         return new TextFormEntry(world, name, isGroup);
     }
@@ -132,8 +133,26 @@ public class CommandManager implements CommandExecutor {
         return ((Permissions) Permissions.instance).getHandler();
     }
 
-    static String getDefaultWorld() {
-        return ((Permissions) Permissions.instance).getDefaultWorld();
+    static String getWorldFor(CommandSender sender) {
+        String world = null;
+        if(sender != null) {
+            world = worldMap.get(sender);
+            if(world == null) {
+                if(sender instanceof Player) {
+                    Player p = (Player) sender;
+                    world = p.getWorld().getName();
+                }
+                
+            }
+        }
+        
+        if(world == null)
+            world = ((Permissions) Permissions.instance).getDefaultWorld();
+        return world;
+    }
+    
+    static void setWorldFor(CommandSender sender, String world) {
+        worldMap.put(sender, world);
     }
 
     public interface CommandHandler {

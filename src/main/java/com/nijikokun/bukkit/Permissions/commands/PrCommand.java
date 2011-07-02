@@ -20,6 +20,8 @@ import com.nijikokun.bukkit.Permissions.commands.CommandManager.StringConverter;
 
 public class PrCommand implements CommandHandler {
 
+    
+    
     @Override
     public boolean onCommand(ArgumentHolder holder, CommandSender sender, MessageHelper msg) {
         String subCommand = holder.getNextArgument();
@@ -55,7 +57,7 @@ public class PrCommand implements CommandHandler {
 
                 if (world == null) {
                     msg.send("&4[Permissions] No world specified. Defaulting to default world.");
-                    world = CommandManager.getDefaultWorld();
+                    world = CommandManager.getWorldFor(sender);
                 }
 
                 if (entryCommand == null) {
@@ -126,7 +128,7 @@ public class PrCommand implements CommandHandler {
                 return;
             }
 
-            CommandManager.getHandler().reload(CommandManager.getDefaultWorld());
+            CommandManager.getHandler().reload(CommandManager.getWorldFor(sender));
             sender.sendMessage(ChatColor.GRAY + "[Permissions] Default world reloaded.");
             return;
         }
@@ -157,7 +159,7 @@ public class PrCommand implements CommandHandler {
     private static void subCommandLoad(ArgumentHolder holder, CommandSender sender, MessageHelper msg) {
         String world = holder.getNextArgument();
         if (world == null)
-            world = CommandManager.getDefaultWorld();
+            world = CommandManager.getWorldFor(sender);
 
         if (!CommandManager.has(sender, "permissions.load." + world)) {
             sender.sendMessage(ChatColor.RED + "[Permissions] You lack the necessary permissions to perform this action.");
@@ -190,7 +192,7 @@ public class PrCommand implements CommandHandler {
             } else {
                 String world = holder.getNextArgument();
                 if (world == null)
-                    world = CommandManager.getDefaultWorld();
+                    world = CommandManager.getWorldFor(sender);
                 if (listingType.equalsIgnoreCase("users")) {
                     if (CommandManager.has(sender, "permissions.list.users")) {
                         Collection<User> users = CommandManager.getHandler().getUsers(world);

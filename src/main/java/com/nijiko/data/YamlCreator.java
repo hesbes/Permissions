@@ -11,6 +11,8 @@ public class YamlCreator implements StorageCreator {
 
     @Override
     public UserStorage getUserStorage(String world, int reload, boolean autosave, Configuration config) throws Exception {
+        if("*".equalsIgnoreCase(world))
+            return new NullUserStorage(world);
         boolean global = world.equals("*");
         String worldString = Permissions.instance.getDataFolder().getPath();
         if (!global)
@@ -35,6 +37,8 @@ public class YamlCreator implements StorageCreator {
 
     @Override
     public GroupStorage getGroupStorage(String world, int reload, boolean autosave, Configuration config) throws Exception {
+        if("*".equalsIgnoreCase(world))
+            return new NullGroupStorage(world);
         boolean global = world.equals("*");
         String worldString = Permissions.instance.getDataFolder().getPath();
         if (!global)
