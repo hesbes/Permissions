@@ -50,7 +50,9 @@ public abstract class Entry {
     }
 
     /**
-     * Method called if a parent is added/removed. Impl note: Currently Clears ALL caches. TODO: Is checking all entries if they are affected more efficient than clearing all caches?
+     * Method called if a parent is added/removed.
+     * Impl note: Currently Clears ALL caches.
+     * TODO: Is checking all entries if they are affected more efficient than clearing all caches?
      * Or should there be a getChildren() function?
      */
     private void groupClearCache() {
@@ -319,12 +321,12 @@ public abstract class Entry {
         if (store != null)
             store.removeParent(name, group.world, group.name);
     }
-    
+
     public void setParents(LinkedHashSet<Group> groups) {
         groupClearCache();
         LinkedHashSet<GroupWorld> groupWs = new LinkedHashSet<GroupWorld>();
-        for(Group g : groups)
-            if(g != null)
+        for (Group g : groups)
+            if (g != null)
                 groupWs.add(g.toGroupWorld());
         Storage store = getStorage();
         if (store != null)
@@ -344,7 +346,6 @@ public abstract class Entry {
         CheckResult cr = has(permission, relevantPerms(permission), new LinkedHashSet<Entry>(), world);
         return cr.getResult();
     }
-
     /**
      * This method is called to update the cache when a node is added/removed.
      * 
@@ -392,7 +393,7 @@ public abstract class Entry {
         checked.add(this);
 
         CheckResult cr = cache.get(node);
-        if(cr != null) {
+        if (cr != null) {
             if (!(world.equals(cr.getWorld()) && cr.isValid())) {
                 cr = null;
             }
@@ -789,6 +790,7 @@ public abstract class Entry {
 
     /**
      * Returns the name of the world this entry belongs to.
+     * 
      * @return World name
      */
     public String getWorld() {
@@ -799,7 +801,7 @@ public abstract class Entry {
     public String toString() {
         return "Entry " + name + " in " + world;
     }
-    
+
     public String toStringNameOnly() {
         return "Entry " + name;
     }
@@ -902,9 +904,11 @@ public abstract class Entry {
 
     public interface EntryVisitor<T> {
         /**
-         * This is the method called by the recursive checker when searching for a value. If the recursion is to be stopped, return a non-null value.
+         * This is the method called by the recursive checker when searching for a value.
+         * If the recursion is to be stopped, return a non-null value.
          * 
-         * @param g Group to test
+         * @param g
+         *            Group to test
          * @return Null if recursion should continue, any applicable value otherwise
          */
         T value(Entry e);

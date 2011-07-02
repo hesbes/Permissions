@@ -105,13 +105,14 @@ public class PrCommand implements CommandHandler {
                     } else if (e instanceof User) {
                         if (entryCommand.equalsIgnoreCase("promote")) {
                             userCommandPromote((User) e, holder, sender, msg);
+                            return true;
                         } else if (entryCommand.equalsIgnoreCase("demote")) {
                             userCommandDemote((User) e, holder, sender, msg);
+                            return true;
                         }
                     }
                 }
                 msg.send("&7[Permissions] Syntax: /pr (g:)<name> (w:[optionalworld]) [create|delete|has|perms|parents|info] ...");
-                //TODO: Show helptext
             }
 
         }
