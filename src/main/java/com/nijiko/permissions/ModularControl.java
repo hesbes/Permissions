@@ -83,6 +83,8 @@ public class ModularControl extends PermissionHandler {
 
     @Override
     public boolean loadWorld(String world) throws Exception {
+        if(world == null)
+            return false;
         if (!checkWorld(world)) {
             forceLoadWorld(world);
             return true;
@@ -98,6 +100,8 @@ public class ModularControl extends PermissionHandler {
 
     @Override
     public void forceLoadWorld(String world) throws Exception {
+        if(world == null)
+            return;
         boolean q = world.equals("?");
         UserStorage userStore = q ? new NullUserStorage(world) : StorageFactory.getUserStorage(world, storageConfig);
         GroupStorage groupStore = q ? new NullGroupStorage(world) : StorageFactory.getGroupStorage(world, storageConfig);
@@ -110,6 +114,8 @@ public class ModularControl extends PermissionHandler {
 
     @Override
     public boolean checkWorld(String world) {
+        if(world == null)
+            return false;
         if (worlds.containsKey(world) || userStorageMirrorings.containsKey(world) || groupStorageMirrorings.containsKey(world)) {
             return true;
         }

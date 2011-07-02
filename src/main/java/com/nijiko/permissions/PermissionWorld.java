@@ -220,6 +220,7 @@ public class PermissionWorld {
 
     PermissionWorld getWorldParent(boolean isUser) {
         String parentName = controller.getWorldParent(world, isUser);
+        System.out.println(parentName);
         if(parentName == null)
             return null;
         try {
