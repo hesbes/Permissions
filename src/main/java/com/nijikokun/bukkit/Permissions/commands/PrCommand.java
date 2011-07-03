@@ -587,6 +587,10 @@ public class PrCommand implements CommandHandler {
         GroupTrackPair gPair = extractTrackAndGroup(u, holder);
         Group parent = gPair.getGroup();
 
+        if (!CommandManager.has(sender, "permissions.promote."+gPair.getTrack())) {
+        	return;
+        }
+        
         if (parent == null) {
             msg.send("&4[Permissions] Specified parent group does not exist.");
             return;
@@ -609,6 +613,10 @@ public class PrCommand implements CommandHandler {
         GroupTrackPair gPair = extractTrackAndGroup(u, holder);
         Group parent = gPair.getGroup();
 
+        if (!CommandManager.has(sender, "permissions.demote."+gPair.getTrack())) {
+        	return;
+        }
+        
         if (parent == null) {
             msg.send("&4[Permissions] Specified parent group does not exist.");
             return;
