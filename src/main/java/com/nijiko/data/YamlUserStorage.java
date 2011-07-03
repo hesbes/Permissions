@@ -249,9 +249,9 @@ public class YamlUserStorage implements UserStorage {
             if (modified) {
                 // System.out.println("Saving world '" + world + "'.");
                 userConfig.save();
+                modified = false;
             }
             userConfig.load();
-            modified = false;
         } finally {
             rwl.writeLock().unlock();
         }

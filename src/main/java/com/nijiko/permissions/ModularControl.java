@@ -15,8 +15,6 @@ import org.bukkit.util.config.Configuration;
 
 import com.nijiko.data.GroupStorage;
 import com.nijiko.data.GroupWorld;
-import com.nijiko.data.NullGroupStorage;
-import com.nijiko.data.NullUserStorage;
 import com.nijiko.data.StorageFactory;
 import com.nijiko.data.UserStorage;
 import com.nijikokun.bukkit.Permissions.Permissions;
@@ -83,7 +81,7 @@ public class ModularControl extends PermissionHandler {
 
     @Override
     public boolean loadWorld(String world) throws Exception {
-        if(world == null)
+        if (world == null)
             return false;
         if (!checkWorld(world)) {
             forceLoadWorld(world);
@@ -100,12 +98,20 @@ public class ModularControl extends PermissionHandler {
 
     @Override
     public void forceLoadWorld(String world) throws Exception {
-        if(world == null)
+        if (world == null)
             return;
         UserStorage userStore = StorageFactory.getUserStorage(world, storageConfig);
         GroupStorage groupStore = StorageFactory.getGroupStorage(world, storageConfig);
         PermissionWorld w = new PermissionWorld(world, this, userStore, groupStore);
         w.reload();
+        String userWorld = w.getUserStoreWorld();
+        String groupWorld = w.getGroupStoreWorld();
+        if (!world.equals(userWorld)) {
+            userStorageMirrorings.put(world, userWorld);
+        }
+        if (!world.equals(groupWorld)) {
+            groupStorageMirrorings.put(world, groupWorld);
+        }
         // System.out.println("Loaded world " + world);
         worlds.put(world, w);
         // System.out.println(worlds);
@@ -113,7 +119,7 @@ public class ModularControl extends PermissionHandler {
 
     @Override
     public boolean checkWorld(String world) {
-        if(world == null)
+        if (world == null)
             return false;
         if (worlds.containsKey(world) || userStorageMirrorings.containsKey(world) || groupStorageMirrorings.containsKey(world)) {
             return true;

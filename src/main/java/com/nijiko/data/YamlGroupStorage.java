@@ -174,10 +174,11 @@ public class YamlGroupStorage implements GroupStorage {
     public void forceSave() {
         rwl.writeLock().lock();
         try {
-            if (modified)
+            if (modified) {
                 groupConfig.save();
+                modified = false;
+            }
             groupConfig.load();
-            modified = false;
         } finally {
             rwl.writeLock().unlock();
         }

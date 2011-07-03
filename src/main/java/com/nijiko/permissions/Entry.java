@@ -29,7 +29,7 @@ public abstract class Entry {
     protected PermissionWorld worldObj;
     protected String name;
     protected String world;
-    protected Map<String, CheckResult> cache = new ConcurrentHashMap<String, CheckResult>();
+    protected Map<String, PermissionCheckResult> cache = new ConcurrentHashMap<String, PermissionCheckResult>();
     protected Set<String> transientPerms = new HashSet<String>();
     private final ConcurrentMap<String, Long> timedPerms = new ConcurrentHashMap<String, Long>();
 
@@ -43,7 +43,7 @@ public abstract class Entry {
      * Clears the cache of this entry.
      */
     public void clearCache() {
-        for (Iterator<CheckResult> iter = cache.values().iterator(); iter.hasNext();) {
+        for (Iterator<PermissionCheckResult> iter = cache.values().iterator(); iter.hasNext();) {
             iter.next().invalidate();
             iter.remove();
         }
@@ -217,7 +217,7 @@ public abstract class Entry {
      * 
      * @return
      */
-    public Map<String, CheckResult> getCache() {
+    public Map<String, PermissionCheckResult> getCache() {
         return Collections.unmodifiableMap(cache);
     }
 
@@ -343,7 +343,7 @@ public abstract class Entry {
     public boolean hasPermission(String permission) {
         if (permission == null)
             return true;
-        CheckResult cr = has(permission, relevantPerms(permission), new LinkedHashSet<Entry>(), world);
+        PermissionCheckResult cr = has(permission, relevantPerms(permission), new LinkedHashSet<Entry>(), world);
         return cr.getResult();
     }
     /**
@@ -354,7 +354,7 @@ public abstract class Entry {
     private void clearCacheNode(String node) {
         if (node == null)
             return;
-        CheckResult cr = cache.remove(node);
+        PermissionCheckResult cr = cache.remove(node);
         if (cr != null)
             cr.invalidate();
     }
@@ -362,12 +362,12 @@ public abstract class Entry {
     /**
      * Checks this entry and its ancestors for the specified permission, and returns a CheckResult object containing more info about the result than hasPermission() provides.
      * 
-     * @see CheckResult
+     * @see PermissionCheckResult
      * @param node
      *            Node to check for
      * @return Results of the check
      */
-    public CheckResult has(String node) {
+    public PermissionCheckResult has(String node) {
         if (node == null)
             return null;
         return has(node, relevantPerms(node), new LinkedHashSet<Entry>(), world);
@@ -386,13 +386,13 @@ public abstract class Entry {
      *            Specialising world
      * @return Result of check
      */
-    protected CheckResult has(String node, LinkedHashSet<String> relevant, LinkedHashSet<Entry> checked, String world) {
+    protected PermissionCheckResult has(String node, LinkedHashSet<String> relevant, LinkedHashSet<Entry> checked, String world) {
 
         if (checked.contains(this))
             return null;
         checked.add(this);
 
-        CheckResult cr = cache.get(node);
+        PermissionCheckResult cr = cache.get(node);
         if (cr != null) {
             if (!(world.equals(cr.getWorld()) && cr.isValid())) {
                 cr = null;
@@ -407,7 +407,7 @@ public abstract class Entry {
             for (String mrn : relevant) {
                 if (perms.contains(mrn)) {
                     skipCache = timedPerms.containsKey(mrn) || transientPerms.contains(mrn);
-                    cr = new CheckResult(this, mrn, this, node, world, skipCache);
+                    cr = new PermissionCheckResult(this, mrn, this, node, world, skipCache);
                     break;
                 }
             }
@@ -415,7 +415,7 @@ public abstract class Entry {
             if (cr == null) {
                 // Check parent permissions
                 for (Entry e : this.getParents(world)) {
-                    CheckResult parentCr = e.has(node, relevant, checked, world);
+                    PermissionCheckResult parentCr = e.has(node, relevant, checked, world);
                     if (parentCr == null)
                         continue;
                     if (parentCr.getRelevantNode() != null) {
@@ -426,7 +426,7 @@ public abstract class Entry {
 
                 if (cr == null) {
                     // No relevant permissions
-                    cr = new CheckResult(this, null, this, node, world, false);
+                    cr = new PermissionCheckResult(this, null, this, node, world, false);
                 }
             }
             cache(cr);
@@ -442,7 +442,7 @@ public abstract class Entry {
      * @param cr
      *            CheckResult to cache.
      */
-    protected void cache(CheckResult cr) {
+    protected void cache(PermissionCheckResult cr) {
         if (cr == null || cr.getNode() == null || cr.shouldSkipCache() || !cr.isValid())
             return;
         cache.put(cr.getNode(), cr);

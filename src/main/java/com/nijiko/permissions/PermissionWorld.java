@@ -259,4 +259,12 @@ public class PermissionWorld {
         }
         return controller.getUserObject(world, name);
     }
+    
+    public String getUserStoreWorld() {
+        return userStore == null ? null : userStore.getWorld();
+    }
+    
+    public String getGroupStoreWorld() {
+        return groupStore == null ? null : groupStore.getWorld();        
+    }
 }

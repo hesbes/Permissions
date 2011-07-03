@@ -7,7 +7,7 @@ package com.nijiko.permissions;
  * and the checked world (used by wildcard specialization).
  * @author rcjrrjcr
  */
-class CheckResult {
+class PermissionCheckResult {
     /**
      * Source of the relevant node
      */
@@ -40,13 +40,13 @@ class CheckResult {
     /**
      * Parent result, which this result was derived from using setChecked
      */
-    private final CheckResult parent;
+    private final PermissionCheckResult parent;
 
-    public CheckResult(Entry source, String relevantNode, Entry checked, String node, String world, boolean skipCache) {
+    public PermissionCheckResult(Entry source, String relevantNode, Entry checked, String node, String world, boolean skipCache) {
         this(source, relevantNode, checked, node, world, skipCache, null);
     }
 
-    public CheckResult(Entry source, String relevantNode, Entry checked, String node, String world, boolean skipCache, CheckResult parent) {
+    public PermissionCheckResult(Entry source, String relevantNode, Entry checked, String node, String world, boolean skipCache, PermissionCheckResult parent) {
         this.source = source;
         this.relevantNode = relevantNode;
         this.checked = checked;
@@ -105,11 +105,11 @@ class CheckResult {
      * @param e
      * @return
      */
-    public CheckResult setChecked(Entry e) {
+    public PermissionCheckResult setChecked(Entry e) {
         if (e == null)
             return null;
         // System.out.println(this);
-        return new CheckResult(source, relevantNode, e, node, world, skipCache, this);
+        return new PermissionCheckResult(source, relevantNode, e, node, world, skipCache, this);
     }
 
     @Override
