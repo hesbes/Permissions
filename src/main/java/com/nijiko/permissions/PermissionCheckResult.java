@@ -7,7 +7,7 @@ package com.nijiko.permissions;
  * and the checked world (used by wildcard specialization).
  * @author rcjrrjcr
  */
-class PermissionCheckResult {
+public class PermissionCheckResult {
     /**
      * Source of the relevant node
      */
@@ -122,6 +122,15 @@ class PermissionCheckResult {
         b.append(" , SkipCache: ").append(skipCache);
         b.append(" , Valid: ").append(valid);
         return b.toString();
+    }
+    
+    public String toShortString() {
+        StringBuilder b = new StringBuilder("Checked: ").append(checked.toString());
+        b.append(" , Node: ").append(node);
+        b.append(" , Source: ").append(source.toString());
+        b.append(" , MRN: ").append(relevantNode);
+        b.append(" , World: ").append(world);
+        return b.toString();        
     }
 
     /**

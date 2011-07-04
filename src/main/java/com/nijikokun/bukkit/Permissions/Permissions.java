@@ -24,7 +24,7 @@ import com.nijiko.data.YamlCreator;
 import com.nijiko.permissions.ModularControl;
 import com.nijiko.permissions.PermissionHandler;
 import com.nijikokun.bukkit.Permissions.commands.CommandManager;
-import com.nijikokun.bukkit.Permissions.commands.PrCommand;
+import com.nijikokun.bukkit.Permissions.commands.OldPrCommand;
 
 /**
  * Permissions 3.x Copyright (C) 2011 Matt 'The Yeti' Burnett <admin@theyeticave.net> Original Credit & Copyright (C) 2010 Nijikokun <nijikokun@gmail.com>
@@ -79,7 +79,7 @@ public class Permissions extends JavaPlugin {
     public void onLoad() {
         instance = this;
         
-        cmdMgr.registerCommand("permissions", new PrCommand());
+        cmdMgr.registerCommand("prold", new OldPrCommand());
         
         Properties prop = new Properties();
         FileInputStream in = null;

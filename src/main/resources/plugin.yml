@@ -15,9 +15,11 @@ commands:
         - perms
         - pr
     description: Provides access to Permissions commands and information.
-    usage: |
-           /pr | Displays Permissions Info
-           /pr -reload | Reloads the default world
-           /pr -reload all | Reloads all worlds
-           /pr -reload [world] | Reloads [world]
-           /pr (g:)<target> (w:<targetworld>) (action) (actionparams) | Directs (action) on specified group/user.
+    prold: 
+    description: Old /pr command, pre-3.2.
+        usage: |
+               /pr | Displays Permissions Info
+               /pr -reload | Reloads the default world
+               /pr -reload all | Reloads all worlds
+               /pr -reload [world] | Reloads [world]
+               /pr (g:)<target> (w:<targetworld>) (action) (actionparams) | Directs (action) on specified group/user.

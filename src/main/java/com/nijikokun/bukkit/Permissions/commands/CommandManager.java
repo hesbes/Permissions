@@ -24,6 +24,7 @@ public class CommandManager implements CommandExecutor {
     private Map<String, CommandHandler> dispatchMap = new HashMap<String, CommandHandler>();
     private static Map<CommandSender, String> worldMap = new HashMap<CommandSender, String>();
 
+    private static final int dist = 10;
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         String name = command.getName();
@@ -35,7 +36,13 @@ public class CommandManager implements CommandExecutor {
         ArgumentHolder holder = new ArgumentHolder(args);
         MessageHelper msg = new MessageHelper(sender);
 
-        return handler.onCommand(holder, sender, msg);
+        try {
+            return handler.onCommand(name, holder, sender, msg);
+        } catch(Throwable t) {
+            msg.send("&4[Permissions] Error occurred while executing command!");
+            t.printStackTrace();
+            return true;
+        }
     }
 
     public void registerCommand(String commandName, CommandHandler handler) {
@@ -46,7 +53,83 @@ public class CommandManager implements CommandExecutor {
     static Entry getEntry(String world, String name, boolean isGroup, boolean create) {
         return isGroup ? getGroup(world, name, create) : getUser(world, name, create);
     }
+    
+    static Entry getEntry(CommandSender sender, TextFormEntry tfe, String offlinePrefix, boolean create, MessageHelper msg) {
+        if(tfe == null)
+            return null;
+        String world = tfe.getWorld();
+        String name = tfe.getName();
+        boolean autocomplete = true;
+        boolean isGroup = tfe.isGroup();
+        if(world == null)
+            world = getWorldFor(sender);
+        if(name == null)
+            return null;
+        if(offlinePrefix != null && !offlinePrefix.isEmpty() && name.startsWith(offlinePrefix)) {
+            name = name.substring(offlinePrefix.length());
+            autocomplete = false;
+        }
+        
+        Entry e = getEntry(world, name, tfe.isGroup(), create);
+        
+        if(e == null && autocomplete) {
+            e = tryAutoComplete(world, name, isGroup, msg);
+        }
+        return e;
+    }
 
+    static class EntryNameConverter implements StringConverter<Entry> {
+        public static final EntryNameConverter instance = new EntryNameConverter();
+
+        @Override
+        public String convertToString(Entry e) {
+            return e.getName();
+        }
+    }
+
+    static class TrackConverter implements StringConverter<String> {
+        public static final TrackConverter instance = new TrackConverter();
+
+        @Override
+        public String convertToString(String o) {
+            if (o == null)
+                return "<Default Track>";
+            else
+                return o;
+        }
+    }
+    
+    static Entry tryAutoComplete(String world, String partialName, boolean isGroup, MessageHelper msg) {
+
+        Entry entry;
+        PermissionHandler handler = CommandManager.getHandler();
+        Set<String> matches = null;
+        if (!isGroup) {
+            matches = CommandManager.asStringSet(handler.getUsers(world), EntryNameConverter.instance);
+            Player[] online = Permissions.instance.getServer().getOnlinePlayers();
+            for (Player p : online) {
+                matches.add(p.getName());
+            }
+        } else {
+            matches = CommandManager.asStringSet(handler.getGroups(world), EntryNameConverter.instance);
+        }
+        String closest = CommandManager.getClosest(partialName, matches, dist);
+
+        if (closest != null) {
+            msg.send("&7[Permissions]&b Using closest match &4" + closest + "&b.");
+            String name = closest;
+            try {
+                entry = isGroup ? handler.safeGetGroup(world, name) : handler.safeGetUser(world, name);
+            } catch (Exception e) {
+                e.printStackTrace();
+                msg.send("&4[Permissions] Error creating user/group.");
+                return null;
+            }
+            return entry;
+        }
+        return null;
+    }
+    
     static Group getGroup(String world, String name, boolean create) {
         PermissionHandler handler = getHandler();
         Group g;
@@ -79,14 +162,27 @@ public class CommandManager implements CommandExecutor {
         return u;
     }
 
-    static TextFormEntry extractEntry(CommandSender sender, ArgumentHolder holder, String groupPrefix) {
+    static TextFormEntry extractEntry(CommandSender sender, ArgumentHolder holder, String groupPrefix, String worldPrefix) {
         String name = holder.getNextArgument();
-        boolean isGroup = name.startsWith(groupPrefix);
-        if (isGroup)
-            name = name.substring(2);
-
-        // String world = extractQuoted(holder, "w:");
-        String world = holder.getNextArgument();
+        boolean isGroup = false;
+        if(name != null) {
+            if(groupPrefix != null && !groupPrefix.isEmpty() && name.startsWith(groupPrefix)) {
+                name = name.substring(groupPrefix.length());
+                isGroup = true;
+            }
+        }
+        
+        String world = holder.peek();
+        if(world != null) {
+            if(worldPrefix == null || worldPrefix.isEmpty()) {
+                holder.getNextArgument();
+            } else if(world.startsWith(worldPrefix)) {
+                world = world.substring(worldPrefix.length());
+                holder.getNextArgument();
+            } else {
+                world = null;
+            }
+        }
         if (world == null)
             world = getWorldFor(sender);
 
@@ -135,28 +231,27 @@ public class CommandManager implements CommandExecutor {
 
     static String getWorldFor(CommandSender sender) {
         String world = null;
-        if(sender != null) {
+        if (sender != null) {
             world = worldMap.get(sender);
-            if(world == null) {
-                if(sender instanceof Player) {
+            if (world == null) {
+                if (sender instanceof Player) {
                     Player p = (Player) sender;
                     world = p.getWorld().getName();
                 }
-                
             }
         }
-        
-        if(world == null)
+
+        if (world == null)
             world = ((Permissions) Permissions.instance).getDefaultWorld();
         return world;
     }
-    
+
     static void setWorldFor(CommandSender sender, String world) {
         worldMap.put(sender, world);
     }
 
     public interface CommandHandler {
-        public boolean onCommand(ArgumentHolder holder, CommandSender sender, MessageHelper msg);
+        public boolean onCommand(String command, ArgumentHolder holder, CommandSender sender, MessageHelper msg);
     }
 
     public static class ArgumentHolder implements Iterable<String> {
@@ -172,6 +267,12 @@ public class CommandManager implements CommandExecutor {
                 return null;
             return args[++index];
         }
+        
+        public String peek() {
+            if (index < -1 || index >= args.length - 1)
+                return null;
+            return args[index + 1];
+        }
 
         public String getCurrentArgument() {
             if (index < 0 || index >= args.length)
@@ -181,6 +282,10 @@ public class CommandManager implements CommandExecutor {
 
         public int getIndex() {
             return index;
+        }
+        
+        public boolean hasNext() {
+            return index >= -1 && index < args.length - 1;
         }
 
         public String[] getArgs() {
