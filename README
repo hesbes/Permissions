@@ -1,4 +1,10 @@
 Permissions... Done right.
+
+As of a few months ago, this plugin is pretty much dead.  I am currently working
+on a new permissions based system that will hopefully be much better in the long
+run.  Unfortunately, that means I do not see this being updated much if at all in
+the future.
+
 Permissions allows plugin-authors to utilise a permission system that handles 
 group inheritance, globalized permission settings, and more. All the features 
 of a fine-grained permission system in one plugin.

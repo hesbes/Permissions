@@ -1,5 +1,9 @@
 Changelog
 
+3.2
+Reordering of branches
+Pulling in the last of the 3.2 changes and closing project.
+
 3.0
 Fix for lowercase world name issue
 Removal of Control and replaced with ModularControl
