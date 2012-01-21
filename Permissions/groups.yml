@@ -44,15 +44,15 @@ groups:
     Default:
         default: true
         info:
-            prefix: ''
-            suffix: ''
+            prefix: '&a Noob_'
+            suffix: '&b'
             build: false
         inheritance:
     Member:
         default: false
         info:
-            prefix: ''
-            suffix: ''
+            prefix: '&c Member_'
+            suffix: '&d'
             build: true
         inheritance:
             - Default
@@ -62,8 +62,8 @@ groups:
     Moderator:
         default: false
         info:
-            prefix: ''
-            suffix: ''
+            prefix: '&1 Moderator_'
+            suffix: '&2'
             build: true
         inheritance:
             - Member
@@ -74,8 +74,17 @@ groups:
     Admins:
         default: false
         info:
-            prefix: ''
-            suffix: ''
+            prefix: '&3 Admin_'
+            suffix: '&4'
+            build: true
+        inheritance:
+        permissions:
+            - '*'
+    Owners:
+        default: false
+        info:
+            prefix: '&3 Owner_'
+            suffix: '&4'
             build: true
         inheritance:
         permissions:
